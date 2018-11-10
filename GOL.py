@@ -22,7 +22,7 @@ def initialize_life():
     return initial_state
 
 
-def run(nGenerations,seed):
+def run(nGenerations, seed):
     neighbors = [[1, 1, 1],
                  [1, 0, 1],
                  [1, 1, 1]]
