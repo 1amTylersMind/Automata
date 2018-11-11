@@ -215,14 +215,22 @@ def main():
             render(sim, 100,True)
 
         if selection == 'fractalize':
+
+            cortana = [[1,1,1,1,1],
+                       [1,2,2,2,1],
+                       [1,2,3,2,1],
+                       [1,2,2,2,1],
+                       [1,1,1,1,1]]
+
             # Run the simulation
-            sim, cell = galactic(10, galaxy, f1)
+            sim, cell = galactic(50, galaxy, cortana)
+            # or galactic(10, galaxy, f1)
             print str(time.time() - dt0) + "s"
             # Render the simulation
             render(sim,100,True)
             render(cell,100,True)
             # Log Runtime for predicting wait time
-            log_runtime(str(str(time.time() - dt0)+"s"))
+            log_runtime(str(sim.pop(0).shape)+"x"+str(len(sim))+" // "+str(str(time.time() - dt0)+"s"))
             # Log the runtime for predicting later on
 
         # sim, cells = simulate(10,seed,explorer)
