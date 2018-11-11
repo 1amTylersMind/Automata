@@ -99,7 +99,7 @@ def menu_opts():
     menu = {1:'galactic_exposure',2:'fractalize'}
     printout = ''
     for key in menu.keys():
-        printout = '[' + str(key) + '] '+menu[key]
+        printout = '[ ' + str(key) + '] '+menu[key]
         print printout
     return menu[int(input('Enter a selection: '))]
 
@@ -164,6 +164,17 @@ def main():
               [0, 1, 0, 0, 0, 1, 0],
               [0, 1, 1, 1, 1, 1, 0],
               [2, 0, 0, 0, 0, 0, 2]]
+
+        f1 = [[1,1,1,0,0,0,1,1,1],
+              [1,3,1,0,0,0,1,3,1],
+              [0,1,1,1,0,1,1,1,0],
+              [0,0,0,1,1,1,0,0,0],
+              [0,0,0,1,1,1,0,0,0],
+              [0,0,0,1,1,1,0,0,0],
+              [0,1,1,1,0,1,1,1,0],
+              [1,3,1,0,0,0,1,3,1],
+              [1,1,1,0,0,0,1,1,1]]
+
         g3 = plt.imread('/media/root/DB0/andromeda.jpg')
         g2 = plt.imread('/media/root/CoopersDB/nebula.png')
         g1 = plt.imread('/media/root/CoopersDB/SPACE.jpg')
@@ -177,7 +188,7 @@ def main():
         if opt == 'andromeda':
             g = g3
         if opt == 'nebula':
-            g = g2[750:1400, 750:1400, :]*255
+            g = g2[750:1400, 750:1400, :]*259
         if opt == 'space':
             g = g1
 
@@ -202,11 +213,14 @@ def main():
             log_runtime(str(time.time() - dt0)+"s")
             # Now Render the simulation, with step size and isColor args
             render(sim, 100,True)
+
         if selection == 'fractalize':
             # Run the simulation
+            sim, cell = galactic(10, galaxy, f1)
             print str(time.time() - dt0) + "s"
             # Render the simulation
-
+            render(sim,100,True)
+            render(cell,100,True)
             # Log Runtime for predicting wait time
             log_runtime(str(str(time.time() - dt0)+"s"))
             # Log the runtime for predicting later on
