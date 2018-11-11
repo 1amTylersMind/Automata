@@ -57,16 +57,16 @@ def main():
             [1,3,2,2,3,1],
             [1,2,1,1,2,1],
             [1,3,2,2,3,1],
-            [1,1,1,1,1,2]]   
-            
-    gravitas = [[1,1,1,1,1,1,1],
-                 [1,2,2,2,2,2,1],
-                 [1,2,3,3,3,2,1],
-                 [1,2,3,0,3,2,1],
-                 [1,2,3,3,3,2,1],
-                 [1,2,2,2,2,2,1],
-                 [1,1,1,1,1,1,1]]        
-    
+            [1,1,1,1,1,2]]
+
+    gravitas = [[1, 1, 1, 1, 1, 1, 1],
+                [1, 2, 2, 2, 2, 2, 1],
+                [1, 2, 3, 3, 3, 2, 1],
+                [1, 2, 3, 0, 3, 2, 1],
+                [1, 2, 3, 3, 3, 2, 1],
+                [1, 2, 2, 2, 2, 2, 1],
+                [1, 1, 1, 1, 1, 1, 1]]
+
     simulation, cellular_clusters = simulate(100, np.random.randint(0,2,15000).reshape((150,100)), filtahs)
     render(simulation,220,False)
     render(cellular_clusters,500,True)
@@ -74,11 +74,10 @@ def main():
     sim, cells = simulate(150, np.random.randint(0,2,15000).reshape((150,100)), mega)
     render(sim,250,False)
     render(cells,250,True)
-    
-    sim, cells = simulate(100, np.random.randint(0,2,30000).reshape((150,200)), gravitas)
-    render(sim,250,False)
-    render(cells,250,True)
-    
+
+    sim, cells = simulate(100, np.random.randint(0, 2, 30000).reshape((150, 200)), gravitas)
+    render(sim, 200, False)
+    render(cells, 200, True)
     
 if __name__ == '__main__':
     main()
