@@ -3,6 +3,15 @@ import sys, os, time
 import scipy.ndimage as ndi
 
 
+def swap(fname, destroy):
+    data = []
+    for line in open(fname, 'r').readlines():
+        data.append(line.replace('\n',''))
+    if destroy:
+        os.system('rm '+fname)
+    return data
+
+
 def render(matrices, speedOfLife, isColor):
     f = plt.figure()
     reel = []
@@ -77,15 +86,54 @@ def galactic(epochs, space, lens):
     return generations, neural
 
 
-def main():
+def filter_preview(galaxy, seed):
+    # Preview the filter to be used
+    f, ax = plt.subplots(1, 2, figsize=(10, 5))
+    ax[0].imshow(galaxy, 'inferno_r')
+    ax[1].imshow(seed, 'gray')
+    plt.show()
 
-    if 'andromeda' in sys.argv:
+
+def menu_opts():
+    print ":: AUTOMATATIZABLE FLAVORS ::"
+    menu = {1:'galactic_exposure',2:'fractalize'}
+    printout = ''
+    for key in menu.keys():
+        printout = '[' + str(key) + '] '+menu[key]
+        print printout
+    return menu[int(input('Enter a selection: '))]
+
+
+def log_runtime(data):
+     os.system('echo '+data+' >> runtimes.txt')
+
+
+def fractalize(ngen, seed, conv):
+    gen = 0
+    generation = []
+    neighbors = []
+    while gen < ngen:
+        generation.append(seed)
+        world = ndi.convolve(seed,conv).flatten()
+        step = np.zeros(seed.shape).flatten()
+        ii = 0
+        for cell in world:
+            ii += 1
+        seed = step.reshape((seed.shape[0],seed.shape[1]))
+        generation.append(seed)
+        neighbors.append(world)
+        gen += 1
+    return generation, neighbors
+
+
+def main():
+    if 'example' in sys.argv:
         simple_seed = np.random.randint(0, 2, 40000).reshape((200, 200))
 
         test_img_slice = plt.imread('/media/root/DB0/andromeda.jpg')
-        test_img_slice = test_img_slice[500:900, 1000:1400, 0] / 3 + \
-                         test_img_slice[500:900, 1000:1400, 1] / 3 + \
-                         test_img_slice[500:900, 1000:1400, 2] / 3
+        test_img_slice = test_img_slice[1000:1400, 1000:1400, 0] / 3 + \
+                         test_img_slice[1000:1400, 1000:1400, 1] / 3 + \
+                         test_img_slice[1000:1400, 1000:1400, 2] / 3
 
         field = [[1, 1, 1, 1, 1],
                  [1, 2, 2, 2, 1],
@@ -93,7 +141,7 @@ def main():
                  [1, 2, 2, 2, 1],
                  [1, 1, 1, 1, 1]]
 
-        sim, cells = simulate(50, test_img_slice, field)
+        sim, cells = simulate(20, test_img_slice, field)
         render(sim, 100, False)
         render(cells, 100, True)
 
@@ -103,39 +151,65 @@ def main():
         print test_img_slice.shape
 
     elif 'science' in sys.argv:
-        g = plt.imread('/media/root/CoopersDB/SPACE.jpg')
+        explorer = np.array([[1, 0, 0, 0, 1],
+                             [0, 1, 1, 1, 0],
+                             [1, 1, 1, 1, 1],
+                             [0, 1, 1, 1, 0],
+                             [1, 0, 0, 0, 1]])
+
+        f0 = [[2, 0, 0, 0, 0, 0, 2],
+              [0, 1, 1, 1, 1, 1, 0],
+              [0, 1, 0, 0, 0, 1, 0],
+              [2, 1, 0, 1, 0, 1, 2],
+              [0, 1, 0, 0, 0, 1, 0],
+              [0, 1, 1, 1, 1, 1, 0],
+              [2, 0, 0, 0, 0, 0, 2]]
+        g3 = plt.imread('/media/root/DB0/andromeda.jpg')
+        g2 = plt.imread('/media/root/CoopersDB/nebula.png')
+        g1 = plt.imread('/media/root/CoopersDB/SPACE.jpg')
+        print "Please choose an image to run experiment with: "
+
+        images = {1:'andromeda',2:'nebula',3:'space'}
+        for image in images.keys():
+            print "["+str(image)+" ] "+images[image]
+        opt = images[int(input('Enter a selection: '))]
+
+        if opt == 'andromeda':
+            g = g3
+        if opt == 'nebula':
+            g = g2[750:1400, 750:1400, :]*255
+        if opt == 'space':
+            g = g1
+
         opt = int(input('Enter granularity for simulation[0-255]: '))
         granularity = np.arange(50,255)
         galaxy = (g[:, :, 0]/3 + g[:, :, 1]/3 + g[:, :, 2]/3)/granularity[opt]
 
-        explorer = np.array([[1, 0, 0, 0, 1],
-                            [0, 1, 1, 1, 0],
-                            [1, 1, 1, 1, 1],
-                            [0, 1, 1, 1, 0],
-                            [1, 0, 0, 0, 1]])
+        seed = ndi.convolve(galaxy, explorer)
 
-        f0 = [[2,0,0,0,0,0,2],
-              [0,1,1,1,1,1,0],
-              [0,1,0,0,0,1,0],
-              [2,1,0,1,0,1,2],
-              [0,1,0,0,0,1,0],
-              [0,1,1,1,1,1,0],
-              [2,0,0,0,0,0,2]]
-
-        f, ax = plt.subplots(1,2)
-        ax[0].imshow(galaxy, 'inferno_r')
-        ax[1].imshow(ndi.convolve(galaxy,explorer),'gray')
-        plt.show()
-        seed = ndi.convolve(galaxy,explorer)
+        filter_preview(galaxy, seed)
 
         print "Analyzing Galaxy of shape "+str(seed.shape)
-        if int(input('Enter 1 to continue:\n'))==1:
-            dt0 = time.time()    # start the clock
+
+        selection = menu_opts()
+        print "Simulation Started"
+        dt0 = time.time()  # start the clock
+        if selection == 'galactic_exposure':
             # run the simulation to eat away at empty space in the galaxy
-            sim, cells = galactic(50, seed, f0)
+            sim, cells = galactic(50, seed[100:600,100:600], f0)
             print str(time.time() - dt0) + "s"
+            # Log Runtime for predicting wait time
+            log_runtime(str(time.time() - dt0)+"s")
             # Now Render the simulation, with step size and isColor args
             render(sim, 100,True)
+        if selection == 'fractalize':
+            # Run the simulation
+            print str(time.time() - dt0) + "s"
+            # Render the simulation
+
+            # Log Runtime for predicting wait time
+            log_runtime(str(str(time.time() - dt0)+"s"))
+            # Log the runtime for predicting later on
 
         # sim, cells = simulate(10,seed,explorer)
         # dt1 = time.time()
