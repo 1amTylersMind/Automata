@@ -105,7 +105,7 @@ def menu_opts():
 
 
 def log_runtime(data):
-     os.system('echo '+data+' >> runtimes.txt')
+    os.system('echo '+data+' >> runtimes.txt')
 
 
 def fractalize(ngen, seed, conv):
@@ -207,30 +207,40 @@ def main():
         dt0 = time.time()  # start the clock
         if selection == 'galactic_exposure':
             # run the simulation to eat away at empty space in the galaxy
-            sim, cells = galactic(50, seed[100:600,100:600], f0)
+            sim, cells = galactic(50, seed[600:1500,600:1000], f0)
             print str(time.time() - dt0) + "s"
             # Log Runtime for predicting wait time
-            log_runtime(str(time.time() - dt0)+"s")
+            log_runtime(str(str(sim.pop(0).shape)+"x"+str(len(sim))+" ... "+
+                        str(time.time() - dt0)+"s"))
             # Now Render the simulation, with step size and isColor args
             render(sim, 100,True)
 
         if selection == 'fractalize':
 
-            cortana = [[1,1,1,1,1],
+            cortana = [[0,1,1,1,0],
                        [1,2,2,2,1],
-                       [1,2,3,2,1],
+                       [1,2,1,2,1],
                        [1,2,2,2,1],
-                       [1,1,1,1,1]]
+                       [0,1,1,1,0]]
+
+            nebulizer = [[0,0,0,1,1,1,1,1,1,0,0,0],
+                         [0,0,0,1,1,2,2,1,1,0,0,0],
+                         [0,0,0,1,2,2,2,2,1,0,0,0],
+                         [1,1,1,1,2,2,2,2,1,1,1,1],
+                         [1,1,1,1,2,2,2,2,1,1,1,1]]
+
+            plt.imshow(galaxy)
+            plt.show()
 
             # Run the simulation
-            sim, cell = galactic(50, galaxy, cortana)
+            sim, cell = galactic(10, galaxy[600:1500,600:1500], cortana)
             # or galactic(10, galaxy, f1)
             print str(time.time() - dt0) + "s"
             # Render the simulation
             render(sim,100,True)
             render(cell,100,True)
             # Log Runtime for predicting wait time
-            log_runtime(str(sim.pop(0).shape)+"x"+str(len(sim))+" // "+str(str(time.time() - dt0)+"s"))
+            log_runtime(str(galaxy.shape)+" // "+str(time.time()-dt0))
             # Log the runtime for predicting later on
 
         # sim, cells = simulate(10,seed,explorer)
