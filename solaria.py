@@ -2,6 +2,11 @@ import numpy as np, matplotlib.pyplot as plt, matplotlib. animation as animation
 import sys, os, time
 import scipy.ndimage as ndi
 
+cortana = [[0,1,1,1,0],
+                       [1,2,2,2,1],
+                       [1,2,1,2,1],
+                       [1,2,2,2,1],
+                       [0,1,1,1,0]]
 
 def swap(fname, destroy):
     data = []
@@ -115,13 +120,17 @@ def fractalize(ngen, seed, conv):
     while gen < ngen:
         generation.append(seed)
         world = ndi.convolve(seed,conv).flatten()
-        step = np.zeros(seed.shape).flatten()
+        step = seed.flatten()
         ii = 0
         for cell in world:
+            if cell > world.mean():
+                step[ii] += 1
+            else:
+                step[ii] =+ 1
             ii += 1
         seed = step.reshape((seed.shape[0],seed.shape[1]))
         generation.append(seed)
-        neighbors.append(world)
+        neighbors.append(world.reshape((seed.shape[0], seed.shape[1])))
         gen += 1
     return generation, neighbors
 
@@ -207,42 +216,51 @@ def main():
         dt0 = time.time()  # start the clock
         if selection == 'galactic_exposure':
             # run the simulation to eat away at empty space in the galaxy
-            sim, cells = galactic(50, seed[600:1500,600:1000], f0)
+            sim, cells = galactic(15, seed[500:1200,500:1200], f0)
             print str(time.time() - dt0) + "s"
             # Log Runtime for predicting wait time
-            log_runtime(str(str(sim.pop(0).shape)+"x"+str(len(sim))+" ... "+
-                        str(time.time() - dt0)+"s"))
+            log_runtime(str(len(sim))+" frame [" + str(cells.pop(0).shape[0]) + "x" +
+                        str(cells.pop(0).shape[0]) + "] in "+str(time.time()-dt0)+"s")
             # Now Render the simulation, with step size and isColor args
             render(sim, 100,True)
-
-        if selection == 'fractalize':
-
-            cortana = [[0,1,1,1,0],
-                       [1,2,2,2,1],
-                       [1,2,1,2,1],
-                       [1,2,2,2,1],
-                       [0,1,1,1,0]]
-
-            nebulizer = [[0,0,0,1,1,1,1,1,1,0,0,0],
-                         [0,0,0,1,1,2,2,1,1,0,0,0],
-                         [0,0,0,1,2,2,2,2,1,0,0,0],
-                         [1,1,1,1,2,2,2,2,1,1,1,1],
-                         [1,1,1,1,2,2,2,2,1,1,1,1]]
-
-            plt.imshow(galaxy)
-            plt.show()
+            render(cells,200,True)
 
             # Run the simulation
-            sim, cell = galactic(10, galaxy[600:1500,600:1500], cortana)
+            sim, cell = galactic(10, galaxy[550:1550, 550:1550], cortana)
             # or galactic(10, galaxy, f1)
             print str(time.time() - dt0) + "s"
             # Render the simulation
-            render(sim,100,True)
-            render(cell,100,True)
+            render(sim, 100, True)
+            render(cell, 100, True)
             # Log Runtime for predicting wait time
-            log_runtime(str(galaxy.shape)+" // "+str(time.time()-dt0))
+            log_runtime(str(galaxy.shape) + " // " + str(time.time() - dt0))
             # Log the runtime for predicting later on
 
+        if selection == 'fractalize':
+
+            nebulizer = [[0,0,0,1,1,1,1,1,1,0,0,0],
+                         [0,0,0,1,1,2,2,1,1,0,0,0],
+                         [0,0,1,2,2,2,2,2,1,1,0,0],
+                         [1,1,1,2,3,3,3,3,2,1,1,1],
+                         [1,2,2,2,3,4,4,3,2,2,1,1],
+                         [1,2,2,0,2,3,3,2,3,2,2,1],
+                         [1,2,2,2,0,3,3,2,2,0,2,1],
+                         [1,2,2,0,2,3,3,2,0,2,2,1],
+                         [1,2,2,2,3,4,4,3,2,2,1,1],
+                         [1,1,2,3,3,3,3,3,2,1,1,0],
+                         [0,0,1,1,2,2,2,2,1,1,0,0],
+                         [0,0,0,1,1,1,1,1,1,0,0,0]]
+            dt0 = time.time()
+
+            sim, cells = fractalize(10, galaxy, nebulizer)
+            # Log the runtime for predicting later on
+            log_runtime(str(len(sim)) + " frame [" + str(cells.pop(0).shape[0]) + "x" +
+                        str(cells.pop(0).shape[0]) + "] in " + str(time.time() - dt0) + "s")
+            """{DEBUG}"""
+            plt.imshow(ndi.convolve(galaxy,nebulizer))
+            plt.show()
+            """{DEBUG}"""
+            render(sim, 200, True)
         # sim, cells = simulate(10,seed,explorer)
         # dt1 = time.time()
         # render(cells,200,True)
