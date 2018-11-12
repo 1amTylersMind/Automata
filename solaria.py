@@ -117,16 +117,19 @@ def fractalize(ngen, seed, conv):
     gen = 0
     generation = []
     neighbors = []
+    medians = []
     while gen < ngen:
         generation.append(seed)
         world = ndi.convolve(seed,conv).flatten()
         step = seed.flatten()
+        avg = world.mean()
+        medians.append(avg)
         ii = 0
         for cell in world:
-            if cell > world.mean():
+            if cell >= avg:
                 step[ii] += 1
             else:
-                step[ii] =+ 1
+                step[ii] -= 1
             ii += 1
         seed = step.reshape((seed.shape[0],seed.shape[1]))
         generation.append(seed)
@@ -237,29 +240,42 @@ def main():
             # Log the runtime for predicting later on
 
         if selection == 'fractalize':
-
+            z=0 # If you want to tweak the nebulizer at a tine grain level
+            h=1 # This provides the generic parametrized version as neb[[]]
+            k=2
+            m=3
+            n=4
             nebulizer = [[0,0,0,1,1,1,1,1,1,0,0,0],
                          [0,0,0,1,1,2,2,1,1,0,0,0],
                          [0,0,1,2,2,2,2,2,1,1,0,0],
                          [1,1,1,2,3,3,3,3,2,1,1,1],
                          [1,2,2,2,3,4,4,3,2,2,1,1],
-                         [1,2,2,0,2,3,3,2,3,2,2,1],
-                         [1,2,2,2,0,3,3,2,2,0,2,1],
-                         [1,2,2,0,2,3,3,2,0,2,2,1],
+                         [1,2,2,2,2,3,3,2,3,2,2,1],
+                         [1,2,2,2,3,3,3,2,2,2,2,1],
+                         [1,2,2,2,2,3,3,2,2,2,2,1],
                          [1,2,2,2,3,4,4,3,2,2,1,1],
                          [1,1,2,3,3,3,3,3,2,1,1,0],
                          [0,0,1,1,2,2,2,2,1,1,0,0],
                          [0,0,0,1,1,1,1,1,1,0,0,0]]
+
+            neb = [[z,z,h,h,z,z],
+                   [z,h,k,k,h,z],
+                   [h,k,m,m,k,h],
+                   [h,k,m,n,k,h],
+                   [z,h,k,k,h,z],
+                   [z,z,h,h,z,z]]
+
+            """{DEBUG}"""
+            plt.imshow(ndi.convolve(galaxy, nebulizer))
+            plt.show()
+            """{DEBUG}"""
             dt0 = time.time()
 
-            sim, cells = fractalize(10, galaxy, nebulizer)
+            sim, cells = fractalize(10, galaxy, neb)
             # Log the runtime for predicting later on
             log_runtime(str(len(sim)) + " frame [" + str(cells.pop(0).shape[0]) + "x" +
                         str(cells.pop(0).shape[0]) + "] in " + str(time.time() - dt0) + "s")
-            """{DEBUG}"""
-            plt.imshow(ndi.convolve(galaxy,nebulizer))
-            plt.show()
-            """{DEBUG}"""
+
             render(sim, 200, True)
         # sim, cells = simulate(10,seed,explorer)
         # dt1 = time.time()
