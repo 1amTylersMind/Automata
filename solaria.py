@@ -130,6 +130,8 @@ def fractalize(ngen, seed, conv):
                 step[ii] += 1
             else:
                 step[ii] -= 1
+            if cell % 2:
+                step[ii] += 1
             ii += 1
         seed = step.reshape((seed.shape[0],seed.shape[1]))
         generation.append(seed)
@@ -200,7 +202,7 @@ def main():
         if opt == 'andromeda':
             g = g3
         if opt == 'nebula':
-            g = g2[750:1400, 750:1400, :]*259
+            g = g2*259
         if opt == 'space':
             g = g1
 
@@ -223,13 +225,13 @@ def main():
             print str(time.time() - dt0) + "s"
             # Log Runtime for predicting wait time
             log_runtime(str(len(sim))+" frame [" + str(cells.pop(0).shape[0]) + "x" +
-                        str(cells.pop(0).shape[0]) + "] in "+str(time.time()-dt0)+"s")
+                        str(cells.pop(0).shape[0]) + "] in "+str(time.time()-dt0)+"s [GALACTIC]")
             # Now Render the simulation, with step size and isColor args
             render(sim, 100,True)
             render(cells,200,True)
 
             # Run the simulation
-            sim, cell = galactic(10, galaxy[550:1550, 550:1550], cortana)
+            sim, cell = galactic(10, galaxy, cortana)
             # or galactic(10, galaxy, f1)
             print str(time.time() - dt0) + "s"
             # Render the simulation
@@ -274,9 +276,10 @@ def main():
             sim, cells = fractalize(10, galaxy, neb)
             # Log the runtime for predicting later on
             log_runtime(str(len(sim)) + " frame [" + str(cells.pop(0).shape[0]) + "x" +
-                        str(cells.pop(0).shape[0]) + "] in " + str(time.time() - dt0) + "s")
+                        str(cells.pop(0).shape[0]) + "] in " + str(time.time() - dt0) + "s [FRACTALIZE]")
 
             render(sim, 200, True)
+            render(cells,200,True)
         # sim, cells = simulate(10,seed,explorer)
         # dt1 = time.time()
         # render(cells,200,True)
