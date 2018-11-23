@@ -92,17 +92,18 @@ def simulation_two(ngen, seed):
     start = time.time()
     while gen <= ngen:
         world = ndi.convolve(seed, conv)
+        mean = world.mean()
         next = seed.flatten()
         II = 0
         for cell in world.flatten():
             if next[II] == 1:
-                if cell > world.mean():
+                if cell > mean:
                     next[II] = 1
                     phase[II] += 1
                 else:
                     next[II] = 0
                     #phase[II] += 1
-            elif next[II] > world.mean():
+            elif next[II] >mean:
                 next[II] = 1
                 #phase[II] += 1
             # Source of decay
@@ -115,7 +116,7 @@ def simulation_two(ngen, seed):
             # source of growth
             if cell > 5:
                 phase[II] += 1
-            if cell < world.mean():
+            if cell < mean:
                 phase[II] -= 1
             if phase[II] < 0:
                 next[II] = 1
@@ -130,9 +131,8 @@ def simulation_two(ngen, seed):
 
 def main():
 
-    # inkBlotter = simulation_one(100, np.array(A))
-    # mazerunner = simulation_one(200, np.array(B))
-    # mazerunner2 = simulation_one(100, np.array(cross))
+    inkBlotter = simulation_one(100, np.array(A))
+    mazerunner = simulation_one(200, np.array(B))
 
     render(simulation_two(100, np.random.randint(0,2,10000).reshape((100,100))),200)
 

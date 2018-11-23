@@ -15,7 +15,7 @@ def render(matrices, speedOfLife):
 def initialize_life():
     width = int(input('Enter width: '))
     height = int(input('Enter height: '))
-    initial_state = np.random.randn(width * height).reshape((width, height)) > 0.5
+    initial_state = np.random.randn(width * height).reshape((width, height)) > 0.3
     plt.imshow(initial_state, 'gray_r')
     plt.title('Initial State [GOL]')
     plt.show()

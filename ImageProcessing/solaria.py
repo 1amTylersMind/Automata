@@ -189,9 +189,9 @@ def main():
               [1,3,1,0,0,0,1,3,1],
               [1,1,1,0,0,0,1,1,1]]
 
-        g3 = plt.imread('/media/root/DB0/andromeda.jpg')
-        g2 = plt.imread('/media/root/CoopersDB/nebula.png')
-        g1 = plt.imread('/media/root/CoopersDB/SPACE.jpg')
+        g3 = plt.imread('/media/root/CoopersDB/Images/andromeda.jpg')
+        g2 = plt.imread('/media/root/CoopersDB/Images/nebula.png')
+        g1 = plt.imread('/media/root/CoopersDB/Images/SPACE.jpg')
         print "Please choose an image to run experiment with: "
 
         images = {1:'andromeda',2:'nebula',3:'space'}
